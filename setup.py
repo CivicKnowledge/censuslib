@@ -45,7 +45,7 @@ classifiers = [
 ]
 
 setup(
-    name='censuslib',
+    name='ambry-censuslib',
     version=censuslib.__version__,
     description='Common support for building census bundles',
     long_description=readme,
