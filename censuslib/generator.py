@@ -35,8 +35,12 @@ class ACS09TableRowGenerator(object):
             with self.bundle.dep('states').datafile.reader as r:
                 for row in r.select( lambda r: r['component'] == '00'):
                     self._states.append((row['stusab'], row['state'], row['name'] ))
-                    
-        return self._states
+
+
+        if self.bundle.limited_run:
+            return self._states[:3]
+        else:
+            return self._states
 
     def generate_source_specs(self):
         """Generate fake source specs for all of the files that underlie this table, which

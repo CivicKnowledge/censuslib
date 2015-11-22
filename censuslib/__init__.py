@@ -11,8 +11,6 @@ from .transforms import *
 
 import ambry.bundle
 
-
-
 class AcsBundle(ambry.bundle.Bundle, MakeTablesMixin, MakeSourcesMixin,
              JamValueMixin, JoinGeofileMixin):
     # Which of the first columns in the data tavbles to use. 
@@ -30,6 +28,18 @@ class AcsBundle(ambry.bundle.Bundle, MakeTablesMixin, MakeSourcesMixin,
         from .util import year_release
 
         self.year, self.release = year_release(self)
+
+    @property
+    def sources(self):
+        """Override the sources list to reduce the number for limited runs. """
+
+        l = super(AcsBundle, self).sources
+
+        if self.limited_run:
+            return l[:10]
+        else:
+            return l
+
 
     @CaptureException
     def _pre_download(self, gen_cls):
