@@ -92,6 +92,7 @@ class ACS09TableRowGenerator(object):
         from ambry_sources import get_source
         from itertools import izip, chain
         from ambry.etl import Slice
+        from ambry.orm import Column
         
         table = self.source.dest_table
         
@@ -123,7 +124,9 @@ class ACS09TableRowGenerator(object):
         assert data_columns[0][-3:] == '001'
         assert data_columns[1][-3:] == 'm90'
 
-        yield header_cols + data_columns
+        all_cols =  [ Column.mangle_name(c) for c in header_cols + data_columns]
+
+        yield all_cols
 
         cache = self.library.download_cache
 
