@@ -32,7 +32,7 @@ class ACS09TableRowGenerator(object):
         
             self._states = []
         
-            with self.bundle.dep('states').datafile.reader as r:
+            with self.bundle.dep('states').reader as r:
                 for row in r.select( lambda r: r['component'] == '00'):
                     self._states.append((row['stusab'], row['state'], row['name'] ))
 
