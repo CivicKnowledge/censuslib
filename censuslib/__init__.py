@@ -29,8 +29,18 @@ class AcsBundle(ambry.bundle.Bundle, MakeTablesMixin, MakeSourcesMixin,
 
         self.year, self.release = year_release(self)
 
+    def edit_pipeline(self, pipeline):
+        """Change the SelectPartitionFromSource so it only writes a single partition"""
+        from ambry.etl import SelectPartitionFromSource
+
+        # THe partition is named only after the table.
+        def select_f(pipe, bundle, source, row):
+            return source.dest_table.name
+
+        pipeline.select_partition = SelectPartitionFromSource(select_f)
+
     @property
-    def sources(self):
+    def x_sources(self):
         """Override the sources list to reduce the number for limited runs. """
 
         l = super(AcsBundle, self).sources

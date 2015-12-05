@@ -18,7 +18,6 @@ class ACS09TableRowGenerator(object):
         self.large_url_template = self.bundle.source('large_area_url').ref
         self.small_url_template = self.bundle.source('small_area_url').ref
 
-        
         self.limited_run = self.bundle.limited_run
 
         self._states = None
@@ -36,7 +35,7 @@ class ACS09TableRowGenerator(object):
                 for row in r.select( lambda r: r['component'] == '00'):
                     self._states.append((row['stusab'], row['state'], row['name'] ))
 
-
+        # On a limited run, only run three states
         if self.bundle.limited_run:
             return self._states[:3]
         else:
