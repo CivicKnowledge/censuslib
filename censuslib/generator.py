@@ -35,7 +35,7 @@ class ACS09TableRowGenerator(object):
                 for row in r.select( lambda r: r['component'] == '00'):
                     self._states.append((row['stusab'], row['state'], row['name'] ))
 
-        # On a limited run, only run three states
+
         if self.bundle.limited_run:
             return self._states[:3]
         else:
@@ -92,6 +92,7 @@ class ACS09TableRowGenerator(object):
         from itertools import izip, chain
         from ambry.etl import Slice
         from ambry.orm import Column
+        from ambry.bundle.process import CallInterval
         
         table = self.source.dest_table
         
@@ -127,13 +128,16 @@ class ACS09TableRowGenerator(object):
 
         yield all_cols
 
+        def progress(read_len, total_len, source_name):
+            self.bundle.log('Downloading {}; {} bytes'.format(source_name, total_len))
+
         cache = self.library.download_cache
 
         row_n = 0
         for spec1, spec2 in self.generate_source_specs():
 
-            s1 = get_source(spec1, cache)
-            s2 = get_source(spec2, cache)
+            s1 = get_source(spec1, cache, callback=CallInterval(progress, 10, source_name=spec1.url))
+            s2 = get_source(spec2, cache, callback=CallInterval(progress, 10, source_name=spec1.url))
 
             for i, (row1, row2) in enumerate(izip(s1, s2)):
                 # Interleave the slices of the of the data rows, prepend
