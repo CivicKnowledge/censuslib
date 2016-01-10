@@ -1,6 +1,6 @@
 # Support for building census bundles in Ambry
 
-__version__ = '0.0.6'
+__version__ = 0.07
 __author__ = 'eric@civicknowledge.com'
 
 

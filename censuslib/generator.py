@@ -33,7 +33,7 @@ class ACS09TableRowGenerator(object):
             with self.bundle.dep('states').reader as r:
                 for row in r.select( lambda r: r['component'] == '00'):
                     if row['stusab'].upper() == 'DC' and int(self.year) == 2014:
-                        states.add((row['stusab'], row['state'], 'DistrictOfColumbia')) # Orig lowercases 'Of' 
+                        states.add((row['stusab'], row['state'], 'DistrictOfColumbia')) # Orig lowercases 'Of'
                     else:
                         states.add((row['stusab'], row['state'], row['name'] ))
 
@@ -89,10 +89,9 @@ class ACS09TableRowGenerator(object):
                     file='m' + file
                 )
 
-
-                print '!!!!', url
-
                 yield (spec1, spec2)
+
+
 
     def __iter__(self):
 
