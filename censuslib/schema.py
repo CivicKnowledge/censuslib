@@ -8,11 +8,12 @@ class MakeTablesMixin(object):
     ##
         
     def create_table_schema(self):
+
+        if self.tables:
+            self.log("Deleteting old tables and partitions")
+            self.dataset.delete_tables_partitions()
         
-        self.log("Deleteting old tables and partitions")
-        self.dataset.delete_tables_partitions()
-        
-        self.commit()
+            self.commit()
 
         tables = self.tables_list()
         
@@ -32,8 +33,11 @@ class MakeTablesMixin(object):
             self.make_source(t)
             
         self.commit()
-        
-        self.sync_out()
+
+        self.build_source_files.schema.objects_to_record()
+        self.build_source_files.sources.objects_to_record()
+
+        self.commit()
 
 
     def make_table(self,  sequence_id, name, universe, description, columns, data):
@@ -99,7 +103,11 @@ class MakeTablesMixin(object):
         except:  # Odd error with 'none' in keys for d
             raise
 
-    def tables_list(self,  add_columns = True):
+    def tables_list(self, add_columns = True):
+        """
+        :param add_columns:
+        :return:
+        """
         from collections import defaultdict
         from ambry.orm.source import DataSource
         from ambry.util import init_log_rate
@@ -123,10 +131,9 @@ class MakeTablesMixin(object):
 
         with self.dep('table_sequence').datafile.reader as r:
             for row in r:
-                
 
                 if int(row['year']) != int(year) or int(row['release']) != int(release):
-                    #print "Ignore {} {} != {} {} ".format(row['year'], row['release'], year, release)
+                    print "Ignore {} {} != {} {} ".format(row['year'], row['release'], year, release)
                     continue
 
                 if row['table_id'] in ignore:
@@ -169,6 +176,8 @@ class MakeTablesMixin(object):
                             
                         )
                     )
+                    #self.log("Added table: {}".format(row['table_id']))
+
         
                 elif 'Universe' in row['title']:
                     tables[table_name]['universe'] = row['title'].replace('Universe: ','').strip()

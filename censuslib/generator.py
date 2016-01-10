@@ -28,13 +28,17 @@ class ACS09TableRowGenerator(object):
         """Return tuples of states, which can be used to make maps and lists"""
         
         if not self._states:
-        
-            self._states = []
+            states = set()
         
             with self.bundle.dep('states').reader as r:
                 for row in r.select( lambda r: r['component'] == '00'):
-                    self._states.append((row['stusab'], row['state'], row['name'] ))
+                    if row['stusab'].upper() == 'DC' and int(self.year) == 2014:
+                        states.add((row['stusab'], row['state'], 'DistrictOfColumbia')) # Orig lowercases 'Of' 
+                    else:
+                        states.add((row['stusab'], row['state'], row['name'] ))
 
+
+            self._states = list(states)
 
         if self.bundle.limited_run:
             return self._states[:3]
@@ -53,6 +57,7 @@ class ACS09TableRowGenerator(object):
             table = self.table(table)
 
         sequence = int(table.data['sequence'])
+
 
         for stusab, state_id, state_name in self.states:
             file = "{}{}{}{:04d}000.txt".format(self.year, self.release,
@@ -83,6 +88,9 @@ class ACS09TableRowGenerator(object):
                     reftype='zip',
                     file='m' + file
                 )
+
+
+                print '!!!!', url
 
                 yield (spec1, spec2)
 

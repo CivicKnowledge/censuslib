@@ -13,7 +13,7 @@ import ambry.bundle
 
 class AcsBundle(ambry.bundle.Bundle, MakeTablesMixin, MakeSourcesMixin,
              JamValueMixin, JoinGeofileMixin):
-    # Which of the first columns in the data tavbles to use. 
+    # Which of the first columns in the data tables to use.
     header_cols = [
         # Column name, Description, width, datatype, column position
         #('FILEID','File Identification',6,'str' ),
@@ -28,6 +28,8 @@ class AcsBundle(ambry.bundle.Bundle, MakeTablesMixin, MakeSourcesMixin,
         from .util import year_release
 
         self.year, self.release = year_release(self)
+
+        self.log("Building Census bundle, year {}, release {}".format(self.year, self.release))
 
     def edit_pipeline(self, pipeline):
         """Change the SelectPartitionFromSource so it only writes a single partition"""

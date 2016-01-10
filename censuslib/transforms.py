@@ -51,6 +51,7 @@ class JoinGeofileMixin(object):
      @property
      @memoize
      def geofile(self):
+
          with self.dep('geofile').reader as r:
              return { (row.stusab, row.logrecno): (row.geoid, row.sumlevel)  
                       for row in r }
