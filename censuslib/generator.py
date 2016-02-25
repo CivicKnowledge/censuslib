@@ -39,13 +39,14 @@ class ACS09TableRowGenerator(object):
         
             with self.bundle.dep('states').reader as r:
                 for row in r.select( lambda r: r['component'] == '00'):
-                    if row['stusab'].upper() == 'DC' and int(self.year) == 2014:
+                    if row['stusab'].upper() == 'DC' and int(self.year) == 2014 and self.release == 5:
                         states.add((row['stusab'], row['state'], 'DistrictOfColumbia')) # Orig lowercases 'Of'
                     else:
                         states.add((row['stusab'], row['state'], row['name'] ))
 
 
             self._states = list(states)
+
 
         if self.bundle.limited_run:
             return self._states[:3]
