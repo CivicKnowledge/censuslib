@@ -1,17 +1,16 @@
 # Ambry Censuslib
 
 
-Support code for building censys bundles in Ambry.
+## How to add a new census Year
+
+### 1) Update the geofile bundles for the year. 
 
 
-## Adding a New Census Year
-
-
-- Update census.gov-acs_geofile-schemas-2009e
+- Update census.gov-acs_geofile-schemas-2009e to include the geofile schemas for the target year
 - Create census.gov-acs-geofile-<year>, the Geofile bundle
 - Create census.gov-acs-p<release>ye<year>, the Census bundle
 
-### Updating the Geofile Schemas, census.gov-acs_geofile-schemas-2009e
+### 2)  Updating the Geofile Schemas, census.gov-acs_geofile-schemas-2009e
 
 For each year, add to the sources:
 
@@ -24,3 +23,22 @@ For each release:
 - 2014-1-sequence: Sequence lookups, from the Census site
 - 2014-1-shell: Table Shells, from the Census site
 
+
+### 3) Add the base sources in the new census year bundle. 
+
+Look at an existing bundle to get an idea of what these are. 
+
+- base_url
+- large_area_url
+- small_area_url
+- geofile
+- table_sequence
+- states
+
+
+### 4) Build the schema
+
+The create_table_schema actually adds both the sources and the schemas. 
+
+    $ bambry exec create_table_schema  
+    $ bambry sync -o 

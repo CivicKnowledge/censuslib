@@ -41,17 +41,6 @@ class AcsBundle(ambry.bundle.Bundle, MakeTablesMixin, MakeSourcesMixin,
 
         pipeline.select_partition = SelectPartitionFromSource(select_f)
 
-    @property
-    def x_sources(self):
-        """Override the sources list to reduce the number for limited runs. """
-
-        l = super(AcsBundle, self).sources
-
-        if self.limited_run:
-            return l[:10]
-        else:
-            return l
-
 
     @CaptureException
     def _pre_download(self, gen_cls):

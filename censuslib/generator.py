@@ -7,6 +7,9 @@ class ACS09TableRowGenerator(object):
     an individual table, and merging the estimates and margins"""
     
     def __init__(self, bundle, source):
+
+        from ambry.exc import NotFoundError
+
         self.source = source
         self.bundle = bundle
         self.library = self.bundle.library
@@ -16,7 +19,11 @@ class ACS09TableRowGenerator(object):
         self.url_root = self.bundle.source('base_url').ref
 
         self.large_url_template = self.bundle.source('large_area_url').ref
-        self.small_url_template = self.bundle.source('small_area_url').ref
+
+        try:
+            self.small_url_template = self.bundle.source('small_area_url').ref
+        except NotFoundError:
+            self.small_url_template = None
 
         self.limited_run = self.bundle.limited_run
 
@@ -57,7 +64,6 @@ class ACS09TableRowGenerator(object):
             table = self.table(table)
 
         sequence = int(table.data['sequence'])
-
 
         for stusab, state_id, state_name in self.states:
             file = "{}{}{}{:04d}000.txt".format(self.year, self.release,
