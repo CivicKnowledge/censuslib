@@ -42,26 +42,37 @@ class CensusSeries(AmbrySeries):
         else:
             return self._dataframe[self.name+'_m90'].astype('float')
 
+    def value(self):
+        """Return the float value for an error column"""
+        if self.name.endswith('_m90'):
+            return self._dataframe[self.name.replace('_m90','')].astype('float')
+        else:
+            return self
+
 
     def se(self):
         """Return a standard error series, computed from the 90% margins"""
-        return self.m90 / 1.645
+        return self.m90() / 1.645
+
+
+    def rse(self):
+        """Return the relative standard error for a column"""
+
+        return self.se() / self.value() * 100
 
     def m95(self):
         """Return a standard error series, computed from the 90% margins"""
-        return self.m90 / 1.645 * 1.96
+        return self.m90() / 1.645 * 1.96
 
 
     def m99(self):
         """Return a standard error series, computed from the 90% margins"""
-        return self.m90 / 1.645 * 2.575
+        return self.m90() / 1.645 * 2.575
 
 
 class CensusDataFrame(AmbryDataFrame):
 
-    def __init__(self, ambry_df):
 
-        super(CensusDataFrame, self).__init__(ambry_df.partition, ambry_df)
 
     def lookup(self, c):
         from ambry.orm.exc import NotFoundError
@@ -104,6 +115,32 @@ class CensusDataFrame(AmbryDataFrame):
 
         return value, m
 
+    def add_sum_m(self, col_name, *cols):
+        """
+        Add new columns for the sum, plus error margins, for 2 or more other columns
+
+        The routine will add two new columns, one named for col_name, and one for <col_name>_m90
+
+        :param col_name: The base name of the new column
+        :param cols:
+        :return:
+        """
+
+        self[col_name], self[col_name+'_m90'] = self.sum_m(*cols)
+
+
+
+    def add_rse(self, *col_name):
+        """
+        Create a new column, <col_name>_rse for Relative Standard Error, using <col_name> and <col_name>_m90
+
+        :param col_name:
+        :return:
+
+        """
+
+        for cn in col_name:
+            self[cn + '_rse'] = self[cn].rse()
 
     def sum_col_group(self, header, last):
         """Sum a contiguous group of columns, and return the sum and the new margins.  """
@@ -222,6 +259,7 @@ class CensusDataFrame(AmbryDataFrame):
         from pandas import DataFrame, Series
         from ambry.orm.exc import NotFoundError
 
+
         result = super(CensusDataFrame, self).__getitem__(key)
 
         if isinstance(result, DataFrame):
@@ -239,6 +277,7 @@ class CensusDataFrame(AmbryDataFrame):
         return result
 
     def copy(self, deep=True):
+
         r =  super(CensusDataFrame, self).copy(deep)
         r.__class__ = CensusDataFrame
         r.partition = self.partition
